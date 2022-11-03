@@ -1,7 +1,7 @@
 import {StudentAddAccount,StudentAddAccountModel,StudentAccountModel,Encrypter,AddStudentAccountRepository} from './db-add-student-account-protocools'
 
 
-export class DbAddStudentAccount{
+export class DbAddStudentAccount implements StudentAddAccount{
   private readonly encrypter: Encrypter;
   private readonly addStudentAccountRepository: AddStudentAccountRepository;
 
@@ -11,7 +11,9 @@ export class DbAddStudentAccount{
   }
   async add(studentAccountData: StudentAddAccountModel): Promise<StudentAccountModel>{
     const hashedPassword = await this.encrypter.encrypt(studentAccountData.password)
-    await this.addStudentAccountRepository.add(Object.assign(studentAccountData,{password:hashedPassword}))
-    return new Promise(resolve => resolve(null)) 
+    const studentAccount = await this.addStudentAccountRepository.add(Object.assign({},studentAccountData,{password:hashedPassword}))
+    return studentAccount;
   }
 }
+//40
+

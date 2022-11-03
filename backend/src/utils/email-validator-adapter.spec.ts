@@ -2,6 +2,8 @@ import { describe,expect,test ,vitest} from "vitest";
 import {EmailValidatorAdapter} from "./email-validator-adapter";
 import validator from 'validator';
 
+console.log('Os teste abaixo ferem a diretriz de testes automatizados!');
+
 // vitest.mock('validator',()=>({
 //   isEmail ():boolean{
 //     return true;

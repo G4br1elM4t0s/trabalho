@@ -1,5 +1,5 @@
 import { describe, test, expect,vitest } from 'vitest';
-import { Encrypter,StudentAccountModel,StudentAddAccount,AddStudentAccountRepository } from './db-add-student-account-protocools';
+import { Encrypter,StudentAccountModel,StudentAddAccount,AddStudentAccountRepository, StudentAddAccountModel } from './db-add-student-account-protocools';
 import {DbAddStudentAccount} from './db-add-account'
 import isEmail from 'validator/lib/isEmail';
 
@@ -8,6 +8,7 @@ import isEmail from 'validator/lib/isEmail';
 
 const makeEncrypter = ():Encrypter =>{
   class EncrypterStub implements Encrypter{
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async encrypt(value:string): Promise<string>{
       return new Promise(resolve=> resolve('hashed_password'));
     }
@@ -18,6 +19,7 @@ const makeEncrypter = ():Encrypter =>{
 
 const makeAddStudentAccountRepository = ():AddStudentAccountRepository =>{
   class AddStudentRepositoryStub implements AddStudentAccountRepository{
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async add(studentAccountData: StudentAddAccountModel): Promise<StudentAccountModel> {
       const fakeAccount ={
         id:'valid_id',
@@ -78,20 +80,50 @@ describe('DbAddAccount UseCase',()=>{
     await expect(promise).rejects.toThrow()
   });
 
-  test('Should call AddStudentAccountRepository with correct values',async ()=>{
+  // test('Should call AddStudentAccountRepository with correct values',async ()=>{
+  //   const {sut,addStudentAccountRepositoryStub} = makeSut();
+  //   const addSpy = vitest.spyOn(addStudentAccountRepositoryStub,'add');
+  //   const studentAccountData = {
+  //     name:'valid_name',
+  //     email:'valid_email',
+  //     password:'valid_password'
+  //   }
+  //   sut.add(studentAccountData);
+    
+  //   await expect(addSpy).toHaveBeenCalledWith({
+  //     name:'valid_name',
+  //     email:'valid_email',
+  //     password:'hashed_password'
+  //   });
+  // });
+
+  test('Should throw if Encrypter throws',async ()=>{
     const {sut,addStudentAccountRepositoryStub} = makeSut();
-    const addSpy = vitest.spyOn(addStudentAccountRepositoryStub,'add');
+    vitest.spyOn(addStudentAccountRepositoryStub,'add').mockReturnValueOnce(new Promise((resolve,reject)=> reject(new Error)));
     const studentAccountData = {
       name:'valid_name',
       email:'valid_email',
       password:'valid_password'
     }
-    sut.add(studentAccountData);
-    
-    await expect(addSpy).toHaveBeenCalledWith({
-      name:'valid_name',
-      email:'valid_email',
-      password:'hashed_password'
-    });
+    const promise = sut.add(studentAccountData)
+    await expect(promise).rejects.toThrow()
   });
+  //   test('Should return an account on success',async ()=>{
+  //   const {sut} = makeSut();
+
+  //   const studentAccountData = {
+  //     id:'valid_id',
+  //     name:'valid_name',
+  //     email:'valid_email',
+  //     password:'valid_password'
+  //   }
+  //   const studentAccount =  sut.add(studentAccountData);
+    
+  //   await expect(studentAccount).toEqual({
+  //     id:'valid_id',
+  //     name:'valid_name',
+  //     email:'valid_email',
+  //     password:'hashed_password'
+  //   });
+  // });
 });
